@@ -28,10 +28,18 @@ jobs:
       - name: Publish Application
         run: dotnet publish --configuration Release --output ./publish --runtime win-x86 --self-contained false
 
-      - name: Deploy to SmarterASP.NET
-        uses: rasmusbuchholdt/simply-web-deploy@2.1.0
+      - name: Deploy to SmarterASP.NET via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          website-name: ${{ secrets.WEBSITE_NAME }}
-          server-computer-name: ${{ secrets.SERVER_COMPUTER_NAME }}
-          server-username: ${{ secrets.SERVER_USERNAME }}
-          server-password: ${{ secrets.SERVER_PASSWORD }}
+          server: ftp.site4now.net
+          username: kerolos2026-001
+          password: ${{ secrets.SERVER_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /site/wwwroot/
+          protocol: ftps
+          port: 21
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/appsettings.Development.json
