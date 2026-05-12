@@ -1,0 +1,46 @@
+name: Build, Publish and Deploy to SmarterASP.NET
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    name: Build & Deploy to SmarterASP.NET
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build Project
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish Application
+        run: dotnet publish --configuration Release --output ./publish --runtime win-x86 --self-contained false
+
+      - name: Deploy to SmarterASP.NET via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: win1005.site4now.net
+          username: kerolos2026-001
+          password: ${{ secrets.SERVER_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: /site/wwwroot/
+          protocol: ftp
+          port: 21
+          log-level: verbose
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/appsettings.Development.json
