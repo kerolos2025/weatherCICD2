@@ -1,0 +1,45 @@
+name: Build, Publish and Deploy to SmarterASP.NET
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:  # ← Enables manual run from GitHub UI
+
+jobs:
+  build_and_deploy:
+    name: Build & Deploy to SmarterASP.NET
+    runs-on: windows-latest
+    
+    steps:
+      # 1. Checkout code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Setup .NET 9
+      - name: Setup .NET 9 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      # 3. Restore NuGet packages
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      # 4. Build in Release mode
+      - name: Build Project
+        run: dotnet build --configuration Release --no-restore
+
+      # 5. Publish for Windows x86 (required by SmarterASP.NET)
+      - name: Publish Application
+        run: dotnet publish --configuration Release --output ./publish --runtime win-x86 --self-contained false
+
+      # 6. Deploy via WebDeploy to SmarterASP.NET
+      - name: Deploy to SmarterASP.NET
+        uses: jahbenjah/SmarterASP.NET-web-deploy@1.0.0
+        with:
+          website-name: ${{ secrets.WEBSITE_NAME }}
+          server-computer-name: ${{ secrets.SERVER_COMPUTER_NAME }}
+          server-username: ${{ secrets.SERVER_USERNAME }}
+          server-password: ${{ secrets.SERVER_PASSWORD }}
+          source-path: '\publish\'
+          target-delete: false
