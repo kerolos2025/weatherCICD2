@@ -36,7 +36,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           local-dir: ./publish/
           server-dir: /site/wwwroot/
-          protocol: ftps
+          protocol: ftp
           port: 21
           exclude: |
             **/.git*
