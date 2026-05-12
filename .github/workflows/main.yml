@@ -31,7 +31,7 @@ jobs:
       - name: Deploy to SmarterASP.NET via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ftp.site4now.net
+          server: win1005.site4now.net
           username: kerolos2026-001
           password: ${{ secrets.SERVER_PASSWORD }}
           local-dir: ./publish/
